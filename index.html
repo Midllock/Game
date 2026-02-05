@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voyager OS - Fullscreen Terminal</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+<div id="ui-wrapper">
+    <div id="hud">
+        <span>X: <span id="pos-x">0</span> | Y: <span id="pos-y">0</span></span>
+        <span>ŽIVOTY: <span id="hp">100</span>%</span>
+        <span>PALIVO: <span id="fuel">100</span>%</span>
+        <span>STAV: <span id="status">OFFLINE</span></span>
+    </div>
+
+    <div id="main-content">
+        <div id="map-section">
+            <canvas id="gameMap"></canvas>
+        </div>
+
+        <div id="terminal-section">
+            <div id="output">=== VOYAGER OS v2.0 ===
+Spotřeba paliva: 1 jedn. / 4 sekundy.
+Pohyb nespotřebovává palivo navíc.
+
+Příkazy: 'vpred [n]', 'vzad [n]', 'vlevo [n]', 'vpravo [n]'
+Systém: 'play', 'stop', 'zalodit', 'reset'</div>
+            <div id="input-area">
+                <span class="prompt">cmd_root></span>
+                <input type="text" id="commandInput" autofocus autocomplete="off">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
