@@ -102,37 +102,112 @@ function updateHUD() {
     draw();
 }
 
-function move(dx, dy, dist = 1) {
+// Přidej do objektu state proměnnou pro sledování pohybu
+state.isMoving = false; 
+
+/**
+ * Hlavní funkce pro plynulý pohyb
+ * @param {number} dx - směr X (-1, 0, 1)
+ * @param {number} dy - směr Y (-1, 0, 1)
+ * @param {number} dist - kolik bloků celkem
+ */
+async function move(dx, dy, dist = 1) { {
+    // KONTROLA: Pokud neběží motory (state.isRunning je false), funkce se ukončí
+    if (!state.isRunning) {
+        log("KRITICKÁ CHYBA: Motory jsou OFFLINE. Zadejte 'play'.", "error");
+        return; 
+    }
+
+    // Zámek proti vícenásobnému pohybu (pokud už loď pluje)
+    if (state.isMoving) return; 
+
+    // ... zbytek logiky pro pohyb ...
+    }
+    if (state.isMoving) {
+        log("Navigační počítač je zaneprázdněn.", "warning");
+        return;
+    }
+
     dist = parseInt(dist) || 1;
-    let count = 0;
-    for(let i=0; i<dist; i++) {
-        if (!state.player.alive || state.player.fuel <= 0) break;
+    state.isMoving = true;
+    let movedTotal = 0;
 
-        let newX = state.player.x + dx;
-        let newY = state.player.y + dy;
+    log(`Zahajuji přesun: ${dist} jednotek...`);
 
-        if(newX >= 0 && newX < canvas.width/gridSize && newY >= 0 && newY < canvas.height/gridSize) {
-            state.player.x = newX;
-            state.player.y = newY;
-            count++;
-        } else {
-            log("Hranice sektoru!", "warning");
+    for (let i = 0; i < dist; i++) {
+        // Kontrola paliva a stavu během cesty
+        if (!state.player.alive || state.player.fuel <= 0) {
+            log("Pohyb přerušen - nedostatek zdrojů!", "error");
             break;
         }
 
-        state.items.forEach((it, idx) => {
-            if(it.x === state.player.x && it.y === state.player.y) {
-                log(`Sběr: ${it.type === 'L' ? 'Lékárnička' : 'Palivo'}`, "success");
-                if(it.type === 'L') state.player.hp = Math.min(100, state.player.hp + 20);
-                else state.player.fuel = Math.min(100, state.player.fuel + 20);
-                state.items.splice(idx, 1);
-            }
-        });
+        let targetX = state.player.x + dx;
+        let targetY = state.player.y + dy;
+
+        // Kontrola hranic mapy
+        if (targetX >= 0 && targetX < Math.floor(canvas.width / gridSize) &&
+            targetY >= 0 && targetY < Math.floor(canvas.height / gridSize)) {
+            
+            // Samotná plynulá animace mezi dvěma bloky
+            await animateStep(dx, dy);
+            
+            movedTotal++;
+            
+            // Kontrola předmětů na nové pozici
+            checkItems();
+        } else {
+            log("Kolize s hranicí sektoru!", "warning");
+            break;
+        }
     }
-    if(count > 0) log(`Přesun: ${count} bloků.`);
+
+    state.isMoving = false;
+    log(`Přesun dokončen. Uraženo ${movedTotal} jednotek.`);
     updateHUD();
 }
 
+/**
+ * Pomocná funkce, která rozdělí pohyb mezi dvěma políčky na drobné kroky
+ */
+function animateStep(dx, dy) {
+    return new Promise((resolve) => {
+        let steps = 10; // Počet mezikroků (čím víc, tím plynulejší, ale pomalejší)
+        let currentStep = 0;
+        
+        // Uložíme si původní pozici
+        const startX = state.player.x;
+        const startY = state.player.y;
+
+        const interval = setInterval(() => {
+            currentStep++;
+            
+            // Posouváme loď o zlomek bloku
+            state.player.x = startX + (dx * (currentStep / steps));
+            state.player.y = startY + (dy * (currentStep / steps));
+            
+            draw(); // Překreslíme plátno
+
+            if (currentStep >= steps) {
+                clearInterval(interval);
+                // Zaokrouhlíme na celá čísla, aby loď "seděla" v mřížce
+                state.player.x = Math.round(state.player.x);
+                state.player.y = Math.round(state.player.y);
+                resolve();
+            }
+        }, 30); // Rychlost animace (30ms mezi kroky)
+    });
+}
+
+function checkItems() {
+    state.items.forEach((it, idx) => {
+        if (Math.round(state.player.x) === it.x && Math.round(state.player.y) === it.y) {
+            log(`Sběr: ${it.type === 'L' ? 'Lékárnička' : 'Palivo'}`, "success");
+            if (it.type === 'L') state.player.hp = Math.min(100, state.player.hp + 20);
+            else state.player.fuel = Math.min(100, state.player.fuel + 20);
+            state.items.splice(idx, 1);
+        }
+    });
+}
 function gameOver(reason) {
     state.isRunning = false;
     clearInterval(state.intervals.hp); 
@@ -173,16 +248,20 @@ cmdInput.addEventListener('keydown', (e) => {
             clearInterval(state.intervals.fuel);
             log("Standby režim.");
         }
+        else if(cmd === 'help') {
+            log(`Příkazy: ${state.isRunning ? "RUNNING" : " dopredu [x], vzadu [x], doleva [x], doprava [x] Systém: play, stop, zalodit, reset"}`);
+            console.log("Dostupné příkazy: vpred [x], vzad [x], vlevo [x], vpravo [x] Systém: play, stop, zalodit, reset");
+        }
         else if(cmd === 'reset') location.reload();
         else if(!state.isRunning && ['vpred','vzad','vlevo','vpravo','zalodit'].includes(cmd)) {
             log("Chyba: Motory vypnuty.", "error");
         }
         else {
             switch(cmd) {
-                case 'vpred':  move(0, -1, arg); break;
-                case 'vzad':   move(0, 1, arg); break;
-                case 'vlevo':  move(-1, 0, arg); break;
-                case 'vpravo': move(1, 0, arg); break;
+                case 'nahoru':  move(0, -1, arg); break;
+                case 'dolu':   move(0, 1, arg); break;
+                case 'doleva':  move(-1, 0, arg); break;
+                case 'doprava': move(1, 0, arg); break;
                 case 'zalodit':
                     if(state.player.x === state.port.x && state.player.y === state.port.y) {
                         log("MISE SPLNĚNA: Přístav dosažen!", "success");
