@@ -7,7 +7,7 @@ const gridSize = 25;
 const fuelImg = new Image();
 const medkitImg = new Image();
 
-fuelImg.src = "gasoline-svgrepo-com.svg";
+fuelImg.src = "gas.svg";
 medkitImg.src = "medkit.svg";
 
 // jen pro jistotu — překreslí mapu po načtení
@@ -49,7 +49,6 @@ window.addEventListener('resize', resizeCanvas);
 function draw() {
     ctx.fillStyle = "#000011";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
 
 
     // Předměty (Lékárničky a Palivo)
