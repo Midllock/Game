@@ -112,7 +112,6 @@ async function move(dx, dy, dist = 1) { {
     // Zámek proti vícenásobnému pohybu (pokud už loď pluje)
     if (state.isMoving) return; 
 
-    // ... zbytek logiky pro pohyb ...
     }
     if (state.isMoving) {
         log("Navigační počítač je zaneprázdněn.", "warning");
@@ -240,7 +239,7 @@ cmdInput.addEventListener('keydown', (e) => {
             log("Standby režim.");
         }
         else if(cmd === 'help') {
-            log(`Příkazy: ${state.isRunning ? "RUNNING" : " dopredu [x], vzadu [x], doleva [x], doprava [x] Systém: play, stop, zalodit, reset"}`);
+            log(`Příkazy: ${state.isRunning ? "RUNNING" : " dopredu [x], dozadu [x], doleva [x], doprava [x] Systém: play, stop, zalodit, reset"}`);
             console.log("Dostupné příkazy: vpred [x], vzad [x], vlevo [x], vpravo [x] Systém: play, stop, zalodit, reset");
         }
         else if(cmd === 'reset') location.reload();
@@ -249,8 +248,8 @@ cmdInput.addEventListener('keydown', (e) => {
         }
         else {
             switch(cmd) {
-                case 'nahoru':  move(0, -1, arg); break;
-                case 'dolu':   move(0, 1, arg); break;
+                case 'dopredu':  move(0, -1, arg); break;
+                case 'dozadu':   move(0, 1, arg); break;
                 case 'doleva':  move(-1, 0, arg); break;
                 case 'doprava': move(1, 0, arg); break;
                 case 'zalodit':
