@@ -4,6 +4,18 @@ const mapContainer = document.getElementById('map-section');
 const cmdInput = document.getElementById('commandInput');
 const gridSize = 25;
 
+const fuelImg = new Image();
+const medkitImg = new Image();
+
+fuelImg.src = "gasoline-svgrepo-com.svg";
+medkitImg.src = "medkit.svg";
+
+// jen pro jistotu — překreslí mapu po načtení
+fuelImg.onload = () => draw();
+medkitImg.onload = () => draw();
+
+
+
 const state = {
     player: { x: 4, y: 4, hp: 100, fuel: 100, alive: true },
     port: { x: 0, y: 0 },
@@ -38,13 +50,24 @@ function draw() {
     ctx.fillStyle = "#000011";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+
+
     // Předměty (Lékárničky a Palivo)
     state.items.forEach(it => {
-        ctx.fillStyle = it.type === 'L' ? "#ff0000" : "#ffff00";
-        ctx.beginPath();
-        ctx.arc(it.x * gridSize + gridSize/2, it.y * gridSize + gridSize/2, gridSize/4, 0, Math.PI*2);
-        ctx.fill();
-    });
+    const px = it.x * gridSize;
+    const py = it.y * gridSize;
+
+    if (it.type === 'L') {
+        if (medkitImg.complete) {
+            ctx.drawImage(medkitImg, px+4, py+4, gridSize-8, gridSize-8);
+        }
+    } else {
+        if (fuelImg.complete) {
+            ctx.drawImage(fuelImg, px+4, py+4, gridSize-8, gridSize-8);
+        }
+    }
+});
+
 
     // Loď
     ctx.save();
@@ -64,79 +87,7 @@ function draw() {
     grad.addColorStop(1, "rgba(0,0,10,0.96)");
     ctx.fillStyle = grad;
     ctx.fillRect(0,0, canvas.width, canvas.height);
-
-    // Přístav
-// === ULTRA VÍCEVRSTVÝ ENERGETICKÝ PORTÁL (méně tlustý shadow) ===
-const centerX = state.port.x * gridSize + gridSize / 2;
-const centerY = state.port.y * gridSize + gridSize / 2;
-const time = Date.now() * 0.002;
-
-// ====== GLOW ZÁKLAD (méně tlustý) ======
-ctx.save();
-ctx.shadowColor = "#00ffff";
-ctx.shadowBlur = 40;  // původně 40 → méně tlusté svícení
-
-const baseGlow = ctx.createRadialGradient(centerX, centerY, 5, centerX, centerY, gridSize * 2);
-baseGlow.addColorStop(0, "rgba(0,255,255,1)");
-baseGlow.addColorStop(0.4, "rgba(0,200,255,0.6)");
-baseGlow.addColorStop(1, "rgba(0,0,50,0)");
-
-ctx.fillStyle = baseGlow;
-ctx.beginPath();
-ctx.arc(centerX, centerY, gridSize * 1.2, 0, Math.PI * 2); // menší radius než 1.6
-ctx.fill();
-ctx.restore();
-
-// ====== ROTUJÍCÍ VRSTVY ======
-ctx.save();
-ctx.translate(centerX, centerY);
-
-// Vrstva 1
-ctx.rotate(time);
-ctx.beginPath();
-ctx.arc(0, 0, gridSize * 0.85, 0, Math.PI * 2); // mírně menší
-ctx.strokeStyle = "#00ffff";
-ctx.lineWidth = 2; // původně 3
-ctx.stroke();
-
-// Vrstva 2 (opačný směr)
-ctx.rotate(-time * 2);
-ctx.beginPath();
-ctx.arc(0, 0, gridSize * 0.65, 0, Math.PI * 2);
-ctx.strokeStyle = "#00ffcc";
-ctx.lineWidth = 1.5; // původně 2
-ctx.stroke();
-
-// Vrstva 3 (rychlejší)
-ctx.rotate(time * 3);
-ctx.beginPath();
-ctx.arc(0, 0, gridSize * 0.45, 0, Math.PI * 2);
-ctx.strokeStyle = "#ffffff";
-ctx.lineWidth = 1; // původně 1.5
-ctx.stroke();
-
-ctx.restore();
-
-// ====== PULZUJÍCÍ VLNA ======
-ctx.beginPath();
-ctx.arc(
-    centerX,
-    centerY,
-    gridSize * 0.5 + Math.sin(time * 4) * 3, // menší amplituda
-    0,
-    Math.PI * 2
-);
-ctx.strokeStyle = "rgba(0,255,255,0.6)";
-ctx.lineWidth = 1.5; // původně 2
-ctx.stroke();
-
-// ====== ENERGETICKÉ JÁDRO ======
-ctx.beginPath();
-ctx.arc(centerX, centerY, gridSize * 0.25, 0, Math.PI * 2);
-ctx.fillStyle = "#ffffff";
-ctx.fill();
-
-    }
+}
 
 // --- LOGIKA ---
 function log(msg, type = "") {
@@ -312,8 +263,8 @@ cmdInput.addEventListener('keydown', (e) => {
         }
         else {
             switch(cmd) {
-                case 'nahoru':  move(0, -1, arg); break;
-                case 'dolu':   move(0, 1, arg); break;
+                case 'dopredu':  move(0, -1, arg); break;
+                case 'dozadu':   move(0, 1, arg); break;
                 case 'doleva':  move(-1, 0, arg); break;
                 case 'doprava': move(1, 0, arg); break;
                 case 'zalodit':
@@ -331,6 +282,8 @@ cmdInput.addEventListener('keydown', (e) => {
     }
 });
 
+
+
 // Start
 resizeCanvas();
-setInterval(draw, 200);
+
