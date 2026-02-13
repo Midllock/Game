@@ -50,7 +50,6 @@ function draw() {
     ctx.fillStyle = "#000011";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-
     // Přístav
     ctx.strokeStyle = "#00ffff";
     ctx.lineWidth = 2;
@@ -95,8 +94,6 @@ function draw() {
     grad.addColorStop(1, "rgba(0,0,10,0.96)");
     ctx.fillStyle = grad;
     ctx.fillRect(0,0, canvas.width, canvas.height);
-
-
 }
 
 // --- LOGIKA ---
