@@ -7,7 +7,7 @@ const gridSize = 25;
 const fuelImg = new Image();
 const medkitImg = new Image();
 
-fuelImg.src = "gasoline-svgrepo-com.svg";
+fuelImg.src = "gas.svg";
 medkitImg.src = "medkit.svg";
 
 // jen pro jistotu — překreslí mapu po načtení
