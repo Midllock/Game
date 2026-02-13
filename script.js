@@ -4,6 +4,18 @@ const mapContainer = document.getElementById('map-section');
 const cmdInput = document.getElementById('commandInput');
 const gridSize = 25;
 
+const fuelImg = new Image();
+const medkitImg = new Image();
+
+fuelImg.src = "gasoline-svgrepo-com.svg";
+medkitImg.src = "medkit.svg";
+
+// jen pro jistotu — překreslí mapu po načtení
+fuelImg.onload = () => draw();
+medkitImg.onload = () => draw();
+
+
+
 const state = {
     player: { x: 4, y: 4, hp: 100, fuel: 100, alive: true },
     port: { x: 0, y: 0 },
@@ -38,6 +50,7 @@ function draw() {
     ctx.fillStyle = "#000011";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+
     // Přístav
     ctx.strokeStyle = "#00ffff";
     ctx.lineWidth = 2;
@@ -49,11 +62,20 @@ function draw() {
 
     // Předměty (Lékárničky a Palivo)
     state.items.forEach(it => {
-        ctx.fillStyle = it.type === 'L' ? "#ff0000" : "#ffff00";
-        ctx.beginPath();
-        ctx.arc(it.x * gridSize + gridSize/2, it.y * gridSize + gridSize/2, gridSize/4, 0, Math.PI*2);
-        ctx.fill();
-    });
+    const px = it.x * gridSize;
+    const py = it.y * gridSize;
+
+    if (it.type === 'L') {
+        if (medkitImg.complete) {
+            ctx.drawImage(medkitImg, px+4, py+4, gridSize-8, gridSize-8);
+        }
+    } else {
+        if (fuelImg.complete) {
+            ctx.drawImage(fuelImg, px+4, py+4, gridSize-8, gridSize-8);
+        }
+    }
+});
+
 
     // Loď
     ctx.save();
@@ -73,6 +95,8 @@ function draw() {
     grad.addColorStop(1, "rgba(0,0,10,0.96)");
     ctx.fillStyle = grad;
     ctx.fillRect(0,0, canvas.width, canvas.height);
+
+
 }
 
 // --- LOGIKA ---
@@ -112,6 +136,7 @@ async function move(dx, dy, dist = 1) { {
     // Zámek proti vícenásobnému pohybu (pokud už loď pluje)
     if (state.isMoving) return; 
 
+    // ... zbytek logiky pro pohyb ...
     }
     if (state.isMoving) {
         log("Navigační počítač je zaneprázdněn.", "warning");
@@ -239,7 +264,7 @@ cmdInput.addEventListener('keydown', (e) => {
             log("Standby režim.");
         }
         else if(cmd === 'help') {
-            log(`Příkazy: ${state.isRunning ? "RUNNING" : " dopredu [x], dozadu [x], doleva [x], doprava [x] Systém: play, stop, zalodit, reset"}`);
+            log(`Příkazy: ${state.isRunning ? "RUNNING" : " dopredu [x], vzadu [x], doleva [x], doprava [x] Systém: play, stop, zalodit, reset"}`);
             console.log("Dostupné příkazy: vpred [x], vzad [x], vlevo [x], vpravo [x] Systém: play, stop, zalodit, reset");
         }
         else if(cmd === 'reset') location.reload();
@@ -267,6 +292,8 @@ cmdInput.addEventListener('keydown', (e) => {
     }
 });
 
+
+
 // Start
 resizeCanvas();
-setInterval(draw, 200);
+
