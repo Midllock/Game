@@ -1,11 +1,12 @@
-help
 grafiku
 obrázky (kanistr, srdce, loď )
 přístav udělat jako vortex(portál)
+rotace loďi
+
 
 
 const fuilelImg = new Image();
-fuile.scr = "fuile.svg"
+fuile.scr = "fuel.svg"
 const medkitImg = new Image();
 medkitImg.src = 'medkit.png'; // Zde vlož cestu ke svému souboru
 const medkitImg = new Image();
