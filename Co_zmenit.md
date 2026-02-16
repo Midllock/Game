@@ -1,24 +1,7 @@
 grafiku
-obrázky (kanistr, srdce, loď )
-přístav udělat jako vortex(portál)
 rotace lodi
 
 
-
-const fuilelImg = new Image();
-fuile.scr = "fuel.svg"
-const medkitImg = new Image();
-medkitImg.src = 'medkit.png'; // Zde vlož cestu ke svému souboru
-
-if (it.type === 'L') {
-            // drawImage(image, x, y, width, height)
-            ctx.drawImage(
-                medkitImg, fuelImg,
-                it.x * gridSize + 2, 
-                it.y * gridSize + 2, 
-                gridSize - 4, 
-                gridSize - 4
-            );}
 
 // VYKRESLENÍ LODĚ
     ctx.save(); // Uloží aktuální stav plátna (bez rotace)
