@@ -1,7 +1,3 @@
-grafiku
-rotace lodi
-
-
 
 // VYKRESLENÍ LODĚ
     ctx.save(); // Uloží aktuální stav plátna (bez rotace)

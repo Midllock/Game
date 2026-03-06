@@ -292,7 +292,7 @@ cmdInput.addEventListener('keydown', (e) => {
             log("Standby režim.");
         }
         else if(cmd === 'help') {
-            log(`Příkazy: ${state.isRunning ? "RUNNING" : " dopredu [x], vzadu [x], doleva [x], doprava [x] Systém: play, stop, zalodit, reset"}`);
+            log(`Příkazy: ${ " dopredu [x], vzadu [x], doleva [x], doprava [x] Systém: play, stop, zalodit, reset"}`);
             console.log("Dostupné příkazy: vpred [x], vzad [x], vlevo [x], vpravo [x] Systém: play, stop, zalodit, reset");
         }
         else if(cmd === 'reset') location.reload();
